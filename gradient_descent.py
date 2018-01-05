@@ -83,4 +83,4 @@ except:
     cost = opts['inf']
 
 # final output
-print('cost at convergence: {} (lower the better)'.format(cost))
+print('SOLUTION cost at convergence: {} (lower the better)'.format(cost))

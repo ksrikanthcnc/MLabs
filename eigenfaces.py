@@ -141,5 +141,5 @@ except:
     rmse = opts['inf']
 
 # final output
-print('rmse on compressed test image: {} (lower the better)'.format(rmse))
 print('time elapsed: {}'.format(time.time() - start))
+print('SOLUTION rmse on compressed test image: {} (lower the better)'.format(rmse))
