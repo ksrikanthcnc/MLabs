@@ -1,0 +1,14 @@
+
+ETHZ Shape Classes: a dataset for testing object class detection algorithms
+===========================================================================
+
+this dataset is adapted from the ETHZ shape classes dataset:
+
+http://www.vision.ee.ethz.ch/en/datasets/
+
+(accessed 06Nov2017)
+
+
+
+
+

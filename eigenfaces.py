@@ -1,8 +1,8 @@
 ####################################################################################
 ## PROBLEM2: EIGENFACES
-## Given the list of faces in the ./data/lfw2_subset/ dataset, we want to learn 
-## an orthonormal basis for the given data. This is learned by obtaining the 
-## eigenvectors of the inut images This technique is generally employed for 
+## Given the list of faces in the ./data/lfw2_subset/ dataset, we want to learn
+## an orthonormal basis for the given data. This is learned by obtaining the
+## eigenvectors of the inut images This technique is generally employed for
 ## various purposes such as recognition, classification, compression.
 ## ref: https://www.youtube.com/watch?v=kw9R0nD69OU
 ## ref: https://en.wikipedia.org/wiki/Eigenface
@@ -17,7 +17,7 @@
 ## normalize_faces
 ## compute_covariance_matrix
 ## compute_eigval_eigvec
-##
+##A
 ##
 ## output: rmse of the test image preserving 80% energy in eigenvalues
 ## (lower the better)
@@ -32,7 +32,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 import scipy
+import scipy.misc
 import os
+import time
 
 def readImages(dirName,refSize,fExt):
     imFeatures = None
@@ -72,7 +74,7 @@ def show_eigvec(eigvec, cumEigval, refSize, energyTh):
             img = np.reshape(eigvec[:,idx],(refSize[0],refSize[1]))
             print("eigenvector: {} cumEnergy: {} of shape: {}".format(idx, cumEigval[idx], img.shape))
             imgplot = plt.imshow(img)
-            plt.show()
+            #plt.show()
         else:
             break
 
@@ -85,7 +87,7 @@ def reconstruct_test(featTest, meanFaces, stddFaces, eigvec, numSignificantEigva
     recon = 0*np.squeeze(feat)
     for idx,w in enumerate(weights):
         recon += w[0]*eigvec[:,idx]
-    # rmse 
+    # rmse
     diff = recon - np.squeeze(norm)
     rmse = np.sqrt(np.inner(np.transpose(diff) , diff) / len(recon))
     return rmse
@@ -97,38 +99,41 @@ opts = {'dirName': './data/lfw2_subset',
         'eps' : 1e-10,
         'inf' : 1e10}
 
+# time stamp
+start = time.time()
+
 try:
     # extract features of all faces
     featFaces, featTest = readImages(opts['dirName'],opts['refSize'],opts['fExt'])
     print("featFaces: {}, featTest {}".format(featFaces.shape, featTest.shape))
-    
-    
+
+
     # extract mean face
     meanFaces, stddFaces = extract_mean_stdd_faces(featFaces)
     print("meanFaces: {}, stddFaces: {}".format(meanFaces.shape, stddFaces.shape))
-    
+
     # normalize faces
     # ref: https://stats.stackexchange.com/questions/69157/why-do-we-need-to-normalize-data-before-principal-component-analysis-pca
     # ref: https://stackoverflow.com/questions/23047235/matlab-how-to-normalize-image-to-zero-and-unit-variance
     normFaces = normalize_faces(featFaces, meanFaces, stddFaces)
     print("normFaces: {}".format(normFaces.shape))
-        
+
     # covariance matrix
     covrFaces = compute_covariance_matrix(normFaces) + opts['eps']
     print("covrFaces: {}".format(covrFaces.shape))
-    
+
     # eigenvalues and eigenvectors
     eigval, eigvec = compute_eigval_eigvec(covrFaces)
     print("eigval: {} eigvec: {}".format(eigval.shape, eigvec.shape))
-    
+
     # find number of eigvenvalues cumulatively smaller than energhTh
     cumEigval = np.cumsum(eigval / sum(eigval))
     numSignificantEigval = next(i for i,v in enumerate(cumEigval) if v > opts['energyTh'])
-    
+
     # show top 90% eigenvectors
     # call this function to visualize eigenvectors
     show_eigvec(eigvec, cumEigval, opts['refSize'],opts['energyTh'])
-    
+
     # reconstruct test image
     rmse = reconstruct_test(featTest, meanFaces, stddFaces, eigvec, numSignificantEigval)
     print('#eigval preserving {}% of energy: {}'.format(100*opts['energyTh'],numSignificantEigval))
@@ -137,3 +142,4 @@ except:
 
 # final output
 print('rmse on compressed test image: {} (lower the better)'.format(rmse))
+print('time elapsed: {}'.format(time.time() - start))

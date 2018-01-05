@@ -1,11 +1,11 @@
 ####################################################################################
 ## PROBLEM3: 2-CLASS IMAGE CLASSIFICATION
 ## Given the ETHZ-Shape dataset, we want to learn a classifier between
-## two classes. Namely: Applelogos and Bottles. In this regard, svm and random 
+## two classes. Namely: Applelogos and Bottles. In this regard, svm and random
 ## forest based classification techniques will be investigated.
 ##
 ##
-## input: directory of faces in ./data/ETHZShapeClasses-V1.2/ 
+## input: directory of faces in ./data/ETHZShapeClasses-V1.2/
 ## functions for reading input features and generating train/test splits are provided.
 ##
 ##
@@ -30,6 +30,7 @@ from PIL import Image
 import scipy
 import os
 from sklearn import datasets, svm, metrics, ensemble
+import time
 
 def train_test_split(fdata,ldata,trainSize):
     np.random.shuffle(fdata)
@@ -48,10 +49,10 @@ def train_random_forest(feat,label):
 
 def train_svm(feat,label):
     pass
-    
+
 def test_classifier(ftest,classifier):
     pass
-    
+
 def eval_performance(pred,ltest,classifier):
     return metrics.f1_score(ltest, pred)
 
@@ -80,7 +81,7 @@ def read_data(rdir,cNames,fExt,refSize):
                     #print("{}".format(img.shape))
                     #imgplot = plt.imshow(img)
                     #plt.show()
-    
+
     print("feat shape: {}, label shape:{}".format(featData.shape,labelData.shape))
     return featData, labelData
 
@@ -89,7 +90,13 @@ opts = {'rdir': './data/ETHZShapeClasses-V1.2/',
         'fExt':'jpg',
         'refSize' : [10,10,3],
         'trainSplit' : 0.7,
-        'inf' : 1e10}
+                'inf' : 1e10,
+        'seed':0}
+
+np.random.seed(opts['seed'])
+
+# time stamp
+start = time.time()
 
 # read the data
 feat,label = read_data(opts['rdir'],
@@ -109,14 +116,14 @@ try:
     classifier_svm = train_svm(ftrain, ltrain)
     predicted = test_classifier(ftest, classifier_svm)
     f1ScoreSVC = eval_performance(predicted,ltest,classifier_svm)
-    
+
     # train test random forest classifier
     # ref: http://scikit-learn.org/stable/modules/ensemble.html
     # ref: https://www.youtube.com/watch?v=3kYujfDgmNk
     classifier_rf = train_random_forest(ftrain, ltrain)
     predicted = test_classifier(ftest, classifier_rf)
     f1ScoreRF = eval_performance(predicted,ltest,classifier_rf)
-    
+
     # print report
     # ref: https://www.youtube.com/watch?v=2akd6uwtowc
     print("f1 scores: (svm) {} , (rf) {}".format(f1ScoreSVC, f1ScoreRF))
@@ -124,6 +131,7 @@ try:
     f1ScoreReport = 1-f1ScoreBest
 except:
     f1ScoreReport = opts['inf']
-    
+
 # final output
 print("lowest 1-f1Score: {} (lower the better)".format(f1ScoreReport))
+print('time elapsed: {}'.format(time.time() - start))

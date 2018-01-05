@@ -30,16 +30,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def load_data(fname):
-    points = np.loadtxt(fname, delimiter=',') 
+    points = np.loadtxt(fname, delimiter=',')
     y_ = points[:,1]
     # append '1' to account for the intercept
-    x_ = np.ones([len(y_),2]) 
+    x_ = np.ones([len(y_),2])
     x_[:,0] = points[:,0]
     # display plot
     plt.plot(x_[:,0], y_, 'ro')
     plt.xlabel('x-axis')
     plt.ylabel('y-axis')
-    plt.show()
+    #plt.show()
     print('data loaded. x:{} y:{}'.format(x_.shape, y_.shape))
     return x_, y_
 
@@ -53,9 +53,9 @@ def update_params(old_params, grad, alpha):
     pass
 
 # initialize the optimizer
-optimizer = {'init_params':np.array([4.5,2.0]) , 
-             'max_iterations':10000, 
-             'alpha':0.00001, 
+optimizer = {'init_params':np.array([4.5,2.0]) ,
+             'max_iterations':10000,
+             'alpha':0.00001,
              'eps':0.0000001,
              'inf':1e10}
 
